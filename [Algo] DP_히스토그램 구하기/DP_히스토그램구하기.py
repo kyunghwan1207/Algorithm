@@ -2,7 +2,7 @@ import sys, math
 def mse(left, right):
 	sum_squared_val = dp2[right] - dp2[left-1]
 	sum_val = dp1[right] - dp1[left-1]
-	return round(sum_squared_val - (sum_val*sum_val)/(right-left+1), 3)
+	return sum_squared_val - (sum_val*sum_val)/(right-left+1)
 def solve(B, n):
 	for i in range(2, B+1): # 그룹이 i(=2, ... B)개 일때 만들어지는 히스토그램의 최소오차값을 minError[i][N]에 저장
 		for j in range(1, n+1):
@@ -21,5 +21,5 @@ for i in range(1, n+1):
 minError = [[math.inf]*(n+1) for _ in range(B+1)] #minError[i][j] = 1부터 j-1까지 범위에서 i개의 그룹으로 만들어지는 히스토그램의 최소오차
 for i in range(1, n+1): # 그룹이 1개일때 minError 초기화
 	minError[1][i] = mse(1, i)
-print(solve(B, n))
+print(round(solve(B, n), 3))
 '''end of main'''

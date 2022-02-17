@@ -1,12 +1,16 @@
+# 이 함수는 한계함수로 사용되며, 
+# 하는일은 해당 노드를 선택했을때 예상되는 최대이익을 fractional knapsack방식으로 계산하여 return함으로써 앞으로 더 선택할지 말지 판단을 최대한 빨리 할 수 있도록 도와줌. 
+# -> 알고리즘 효율성 증가
 def frac_knapsack(i, size):
-	'''
-	입력: 
-    	i: 선택해서 배낭에 넣을 노드번호
-		size: 배낭의 남은 용량
-	출력:
-		i번째 노드를 선택해서 배낭에 넣었을때 예상되는 최대이익
-	'''
-	pass
+	current_size, current_prof = 0, 0
+	for j in range(i, n):
+		if current_size + L[j][2] <= size:
+			current_size += L[j][2] # L[j][2] == 가성비 기준으로 정렬했을때의 S[j]
+			current_prof += L[j][1] # L[j][1] == 가성비 기준으로 정렬했을때의 P[j]
+		else:
+			current_prof += (size-current_size)*L[j][0]
+			break
+	return current_prof
 	
 def knapsack(i, size): 
 	# 0부터 i-1까지는 뽐을지 말지 정했고 이제 i번째 노드를 뽑 o/x -> 1/0 정하면됨, size는 남은용량

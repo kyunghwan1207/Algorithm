@@ -47,3 +47,15 @@ for i in range(1, n+1):
         else:
             print(switch[i], end=' ')
 '''end of main'''
+
+'''
+<알고리즘 설명>
+Step1. 각 학생마다 성별에 맞는 규칙으로 스위치 상태 변경
+Step2. 최종으로 변경된 스위치 상태 출력
+
+<수행시간 분석>
+스위치의 개수를 n, 학생의 수를 m이라고 하면
+Step1. O(n*m)
+Step2. O(n)
+=> 총 수행시간: O(n) + O(n*m) = O(n*m)
+'''

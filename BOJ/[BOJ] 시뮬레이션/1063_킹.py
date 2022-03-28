@@ -45,3 +45,17 @@ r_stone_final = abs(r_stone - 8)
 c_stone_final = chr(c_stone + 65)
 print(c_stone_final + str(r_stone_final))
 '''end of main'''
+
+'''
+<알고리즘 설명>
+문제의 그림대로 행, 열을 기준으로 좌측상단을 (0, 0), 우측하단을 (7, 7)로 보고 풀이진행 하였음.
+Step1. 명령어에 따라 적절히 이동할 수 있도록 리스트로 매핑이후 사용할 변수 할당
+Step2. 명령어를 입력받고 킹이 이동할 좌표를 설정함 -> (nr, nc) 할당
+Step3. out함수를 통해 (nr, nc), 돌이 이동할 좌표(r_stone + dr[d], c_stone + dc[d])가 유효한지 확인 후 적절한 로직수행
+
+<수행시간 분석>
+움직이는 횟수를 n, 상수를 c라고 하면
+Step1.   O(c)
+Step2,3. O(n*c) (이유: n만큼 반복해야 하므로)
+=> 총 수행시간: O(c) + O(n*c) = O(n)
+'''

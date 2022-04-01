@@ -41,3 +41,19 @@ for i in range(n):
     for j in range(m):
         print(arr[i][j], end =' ')
 '''end of main'''
+
+'''
+<알고리즘 설명>
+Step1. 사용할 변수 및 배열 할당
+Step2. rotate함수 호출
+Step3. 꺾이는 값을 별도로 저장한 후 상,하,좌,우를 각 회전한 후 다시 꺾이는 값을 배열의 적절한 위치에 저장
+Step4. 배열원소 출력
+
+<수행시간 분석>
+배열의 크기를 n x m 이라고 하고, 회전 횟수를 r이라고 하면
+Step1. O(n)
+Step2,3. O(r*m*n)  
+(이유: rotate함수의 호출횟수는 min(n,m) 만큼 반복되고, rotate함수 내부적으로 수행시간을 결정하는 것은 max(n,m)이므로 -> n과 m의 최댓값, 최솟값이 각각 수행시간에 영향을 끼침)
+Step4. O(n*m)
+=> 총 수행시간: O(n) + O(r*n*m) + O(n*m) = O(r*n*m)
+'''

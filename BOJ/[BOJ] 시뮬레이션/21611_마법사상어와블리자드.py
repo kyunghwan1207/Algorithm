@@ -1,157 +1,138 @@
-# 1420 ~ 1630
-def OOB(x, y):
-    return x < 0 or x >= n or y < 0 or y >= n
+# 구슬 파괴하기
+def breakBiz(d, s):
+    res = []
+    step = s
+    nx, ny = start, start
+    while step:
+        step -= 1
+        nx, ny = nx + dx[d], ny + dy[d]
+        # 어차피 s <= (n-1)/2 이기 때문에 범위벗어나는거 체크필요x
+        res.append([nx, ny])
+    return res
 
-def show(b1d):
-    global n
-    tboard = [[0 for _ in range(n)] for _ in range(n)]
-    tlist = list(board_map.keys())
+# 구슬 움직이기
+def moveBiz(biz1d):
+    biz1d_temp = [0] * (n ** 2 - 1)
+    bidx = 0
+    for i in range(len(biz1d)):
+        if biz1d[i] == 0: continue
+        cnt = biz1d[i]
+        biz1d_temp[bidx] = cnt
+        bidx += 1
+    for i in range(len(biz1d)):
+        biz1d[i] = biz1d_temp[i]
+    return biz1d
 
-    for i in range(n*n-1):
-        r, c = tlist[i][0], tlist[i][1]
-        tboard[r][c] = b1d[board_map.get((r, c))]
-    for i in range(n):
-        print()
-        for j in range(n):
-            print(tboard[i][j], end=' ')
-    print()
+# 구슬 변화하기
+def changeBiz(biz1d):
+    temp_biz1d = [0]*(n**2 - 1)
+    curr_num = biz1d[0]
+    cnt = 1
+    bidx = 0
+    for i in range(1, len(biz1d)):
+        if curr_num == biz1d[i]:
+            cnt += 1
+        elif curr_num != biz1d[i]:
+            if bidx >= len(biz1d): break
+            temp_biz1d[bidx] = cnt
+            if bidx+1 >= len(biz1d): break
+            temp_biz1d[bidx+1] = curr_num
+            bidx += 2
+            # if bidx >= len(biz1d): break
+            curr_num = biz1d[i]
+            cnt = 1
+            if biz1d[i] == 0: break
 
-def break_biz(d, z):
-    global s, cnt_list
-    #     0, n   s    w    e
-    bx = [0, -1, 1, 0,  0]
-    by = [0, 0, 0, -1, 1]
-    nx, ny = s, s
-    while z:
-        nx, ny = nx + bx[d], ny + by[d]
-        if OOB(nx, ny): break
-        idx = board_map.get((nx,ny))
-        # cnt_list[board1d[idx]] += 1 # 파괴된 x 폭발한 o
-        board1d[idx] = 0
-        z -= 1
-    # print('after_break_biz/board1d: ', board1d)
-    # show(board1d)
+    for i in range(len(biz1d)):
+        biz1d[i] = temp_biz1d[i]
+    return biz1d
 
-
-def move_biz():
-    global board1d, s
-    nx, ny = s, s
-    ridx = 0 # board1d룰 가리키는 idx
-    # print('before_move_board1d: ', board1d)
-    board1d_temp = [0] * (n*n-1)
-    tidx = 0 # board1d_temp를 가리키는 idx
-    for i in range(len(board1d)):
-        if board1d[i] == 0:
-            continue
-        board1d_temp[tidx] = board1d[i]
-        tidx += 1
-    board1d = [0] *(n*n - 1)
-    for i in range(len(board1d)):
-        board1d[i] = board1d_temp[i]
-    # print('after_move_board1d: ', board1d)
-    # show(board1d)
-
+# 2D 좌표정보를 1D로 매핑
+def map2Dto1D(board2d, board1d):
+    cnt = 0 # 방향 바꾼 횟수겸 다음으로 전진할 방향
+    step = 0 # 전진할 횟수
+    nx, ny = start, start
+    flag= True
+    bidx = 0 # 1D에 정보 채울 위치
+    while flag:
+        if cnt%2 == 0:
+            step += 1
+        for _ in range(step):
+            nx, ny = nx + d1x[cnt], ny + d1y[cnt]
+            board1d[bidx] = [nx, ny] # 2D 좌표정보를 1D에서 관리
+            biz1d[bidx] = board2d[nx][ny] # 구슬 정보는 다른 리스트에서 관리(moveBiz()할 때 편하기 위함)
+            bidx += 1
+            if nx == 0 and ny == 0: flag = False;break
+        cnt = (cnt+1)%4
+    return board1d
 
 if __name__ == "__main__":
-    n,m = map(int,input().split())
-    board2d = [list(map(int, input().split())) for _ in range(n)]
-    command = [list(map(int, input().split())) for _ in range(m)]
-    cnt_list = [0] * 4 # [0, {폭발한 1번 구슬의 개수}, {폭발한 2번 구슬의 개수}, {폭발한 3번 구슬의 개수}]
-    # 1, 2, 3, 4 : 'u(n) 3' 'd(s) 1' 'l(w) 0' 'r(e) 2'
-    #    w   s   e   n
-    dx = [0, 1, 0, -1]
-    dy = [-1, 0, 1, 0]
-    s = int((n+1)/2 - 1)
-    board_map = {} # { (row, col): 일차원 리스트의 index }
-    board1d = [0] * (n*n - 1) # 일차원 리스트
+    n, m = map(int, input().split())
+    start = n//2 # 시작좌표
+    board2d  = []
+    #     n  s  w  e
+    dx = [-1, 1, 0, 0]
+    dy = [0,  0,-1, 1]
+    # 2D->1D 할 때 사용할 것
+    # w  s  e  n
+    d1x = [0, 1, 0, -1]
+    d1y = [-1, 0, 1, 0]
+    ans_list = [0]*4
+    for _ in range(n):
+        board2d.append(list(map(int, input().split())))
+    # 가운데 상어의 좌표는 필요 없기 때문에 n**2에서 -1을 해준다
+    board1d = [0] * (n ** 2 - 1)
+    biz1d = [0] * (n ** 2 - 1)
 
-    # // board2d 정보를 board1d로 저장하고 board_map으로 2d좌표->1d인덱스로 매핑정보 저장
-    pattern = 0
-    step = 1
-    flag = True
-    val, d = 0, 0
-    nx, ny = s, s
-    while flag:
-        for st in range(step):
-            nx, ny = nx + dx[d], ny + dy[d]
-            if OOB(nx, ny):
-                flag = False
-                break
-            board_map[(nx, ny)] = val
-            board1d[val] = board2d[nx][ny]
-            val += 1
-        d = (d+1) % 4
-        pattern += 1
-        if pattern != 0 and pattern % 2 == 0:
-            step += 1
+    # 2차원 좌표 정보를 1차원으로 관리
+    board1d = map2Dto1D(board2d, board1d)
 
-    for t in range(m):
-        # 구슬 파괴
-        break_biz(command[t][0], command[t][1])
-        # 구슬 빈칸 채우기 이동
-        move_biz()
-        # 구슬 폭발 (동시에 폭발)
-        fflag = True
-        c = 0
-        while fflag:
-            c += 1
-            sidx, cnt = 0, 1
-            num = board1d[sidx]
-            fflag = False
-            '''이미 num을 board1d[0]으로 잡았으니까 [1 ~ len(board1d)-1] 범위만 탐색하는 것이 맞다!'''
-            for i in range(1, len(board1d)):
-                if num == board1d[i]:
-                    cnt += 1
-                elif cnt >= 4:
-                    for j in range(sidx, i):
-                        board1d[j] = 0
-                    cnt_list[num] += cnt
-                    sidx = i
-                    num = board1d[sidx]
-                    cnt = 1
-                    fflag = True
-                elif i == len(board1d) - 1:
-                    if cnt >= 4:
-                        for j in range(sidx, i):
-                            board1d[j] = 0
-                        cnt_list[num] += cnt
-                        sidx = i
-                        num = board1d[sidx]
-                        cnt = 1
-                        fflag = True
-                else:
-                    cnt = 1
-                    sidx = i
-                    num = board1d[sidx]
-            # 이동 후 폭발가능하면 폭발하기 반복
-            # print(f"\n{c}. expload | cnt_list: {cnt_list}")
-            move_biz()
-        # print('after_expload_board1d: ', board1d)
-        # show(board1d)
-        # // 구슬 변화하기
-        temp_board = [0] * (n*n - 1)
-        tidx = 0
-        num = board1d[0]
-        cnt = 1
-        for i in range(1, len(board1d)):
-            if num == board1d[i]:
-                cnt += 1
-            else:
-                if tidx >= n*n - 1: break
-                temp_board[tidx] = cnt
-                if tidx + 1 >= n*n - 1: break
-                temp_board[tidx + 1] = num
-                num = board1d[i]
-                cnt = 1
-                tidx += 2
+    for _ in range(m):
+        d, s = map(int, input().split())
+        d -= 1
+        break_list = breakBiz(d, s)
+        break_cnt = len(break_list)
+
+        # 뱅글뱅글 도는것과 마찬가지기 때문에 break_list[]값은 board1d[]를
+        # 순차적으로 돌면서 한번만 체크하면서 0으로 만들어줘도된다.
+
+        # 구슬 파괴된 것을 1d에 반영
+        bidx = 0
         for i in range(len(board1d)):
-            board1d[i] = temp_board[i]
-        # print('after_change_board1d: ', board1d)
-        # print(f"{t}. board1d: ", board1d, "\n")
-        # show(board1d)
+            if board1d[i] == 0: break
+            x, y = board1d[i]
+            if bidx >= break_cnt: break
+            if break_list[bidx][0] == x and break_list[bidx][1] == y:
+                biz1d[i] = 0
+                bidx += 1
+        # 구슬 움직이기
+        biz1d = moveBiz(biz1d)
+        # 구슬 폭발시키기
+        flag= True # 구슬 폭발을 계속해야할지 여부
+        while flag:
+            flag = False
+            curr_num = biz1d[0]
+            cnt = 1
+            for i in range(1, len(biz1d)):
+                if curr_num == biz1d[i]:
+                    cnt += 1
+                elif curr_num != biz1d[i]:
+                    if cnt>=4:
+                        flag = True
+                        ans_list[curr_num] += cnt
+                        for c in range(1, cnt+1):
+                            biz1d[i-c] = 0
+                    if biz1d[i] == 0: break # **0 만나면 break!**
+                    curr_num = biz1d[i]
+                    cnt = 1
+            # 구슬 움직이기
+            biz1d = moveBiz(biz1d)
+        # 폭발완료 후 구슬 변화시키기
+        biz1d = changeBiz(biz1d)
+
     ans = 0
     for i in range(1, 4):
-        ans += i * cnt_list[i]
+        ans += i*ans_list[i]
     print(ans)
 
 '''
@@ -160,5 +141,13 @@ if __name__ == "__main__":
 2. [리스트이동문제] move_biz(); 동일 리스트안에서 이동이 발생할 경우 별도의 리스트둬서 copy하자
 3. [초기값문제] 폭발하기에서 num을 board1d[0]으로이미 초기화했으니까 [1 ~ len(board1d)-1]까지 탐색하면됨 
 4. [코드작성 순서문제] sidx = i; num = board1d[sidx]하기전에 cnt_list[num] += cnt 하자!
-                        
+5. 예외적인 TC 잘 만들어서 오류 잘 잡았다
+6. 구슬폭발 시킬 떄, curr_num != biz1d[i] 일 때,
+bizid[i]가 0일 수도 있는 경우 고려하자!
+3 1
+1 1 1
+1 0 1
+1 1 1
+2 1
+> 7
 '''

@@ -1,14 +1,15 @@
-def printNumSeq(s, start, n, m):
+def printNumSeq(n, m, s):
     if len(s) == m:
+        # print(s)
         print(' '.join(map(str, s)))
         return
-    for i in range(start, n+1):
+    for i in range(1, n+1):
         s.append(i)
-        printNumSeq(s, i+1, n, m)
+        printNumSeq(n, m, s)
         s.pop()
 
 
 if __name__ == "__main__":
     n, m = map(int, input().split())
     s = []
-    printNumSeq(s, 1, n, m)
+    printNumSeq(n, m, s)

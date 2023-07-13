@@ -1,7 +1,7 @@
 
 def printSeqNum(seqList, numList, visited, m):
     if len(seqList) == m:
-        print(*seqList)
+        print(*seqList) # ' '.join(map(str, seqList))와 출력 결과 같음
         return
     prev = 0
     for i in range(0, len(numList)):
